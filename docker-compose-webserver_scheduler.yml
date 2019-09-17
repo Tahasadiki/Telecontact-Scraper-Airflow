@@ -1,0 +1,49 @@
+version: '3'
+services:
+  airflow-webserver:
+    image: puckel-airflow-with-docker-inside    
+    build: airflow/
+    restart: always
+    env_file:
+      - ./cluster.env
+    environment:
+      - LOAD_EX=n
+      - FERNET_KEY=CqzY_r_nxUJEus9-EfLmr8AqY3f0wNTKQgZaN5tUMPs=
+      - EXECUTOR=Celery
+      - POSTGRES_HOST=$AIRFLOW_POSTGRES_HOST
+      - REDIS_PASSWORD=redispass
+      - REDIS_HOST=$AIRFLOW_REDIS_HOST
+      #airflow config variables
+      - AIRFLOW__CORE__PARALLELISM=4
+      - AIRFLOW__CORE__DAG_CONCURRENCY=2
+    volumes:
+      - ./airflow/dags:/usr/local/airflow/dags
+      - ./airflow/plugins:/usr/local/airflow/plugins
+      - ./airflow/requirements.txt:/requirements.txt
+    ports:
+      - "5001:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  scheduler:
+    image: puckel-airflow-with-docker-inside    
+    build: airflow/
+    restart: always
+    depends_on:
+        - airflow-webserver
+    volumes:
+        - ./airflow/dags:/usr/local/airflow/dags
+        - ./airflow/requirements.txt:/requirements.txt
+        # Uncomment to include custom plugins
+        # - ./plugins:/usr/local/airflow/plugins
+    env_file:
+      - ./cluster.env
+    environment:
+        - LOAD_EX=n
+        - FERNET_KEY=CqzY_r_nxUJEus9-EfLmr8AqY3f0wNTKQgZaN5tUMPs=
+        - EXECUTOR=Celery
+    command: scheduler

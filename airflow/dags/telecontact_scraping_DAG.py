@@ -36,11 +36,11 @@ def do_test_docker():
 
 def get_task(activity,city):
     return DockerOperator(
-        task_id= f'min_{activity}_{city}',
-        image='tahasadiki/telecontact-scraper',
+        task_id= f'mine_{activity}_{city}',
+        image='tahasadiki/telecontact-scraper:latest',
         api_version='auto',
         auto_remove=True,
-        command="{activity} {city}",
+        command=f"{activity} {city}",
         docker_url="unix://var/run/docker.sock",
         network_mode="bridge"
     )

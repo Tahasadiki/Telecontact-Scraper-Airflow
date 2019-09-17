@@ -1,0 +1,23 @@
+version: '3'
+services:
+  telecontact-scraper:
+    image: tahasadiki/telecontact-scraper:latest
+ 
+  worker:
+    image: puckel-airflow-with-docker-inside    
+    build: airflow/
+    restart: always
+    depends_on:
+        - telecontact-scraper
+    volumes:
+        - ./airflow/dags:/usr/local/airflow/dags
+        - ./airflow/requirements.txt:/requirements.txt
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+    env_file:
+      - ./cluster.env
+    environment:
+        - FERNET_KEY=CqzY_r_nxUJEus9-EfLmr8AqY3f0wNTKQgZaN5tUMPs=
+        - EXECUTOR=Celery
+        - PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:~/.local/bin
+        - AIRFLOW__CELERY__WORKER_CONCURRENCY=4
+    command: worker
