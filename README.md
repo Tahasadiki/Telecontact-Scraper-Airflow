@@ -1,2 +1,5 @@
 # Telecontact-Scraper-Airflow
-Use Apache airflow to schedule and run scraping telecontact.ma
+A tool that uses :
+    *Apache airflow 
+    *[telecontact-scraper](https://github.com/Tahasadiki/Telecontact-Scraper)
+    to schedule and run scraping telecontact.ma
